@@ -70,6 +70,8 @@ export class ImageService {
         ? { users: { connect: { id: data.imageableId } } }
         : { agencies: { connect: { id: data.imageableId } } };
 
+    delete data.imageableId;
+    delete data.imageableType;
     return await this.prisma.avatar.create({
       data: {
         ...data,
