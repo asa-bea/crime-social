@@ -1,0 +1,554 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email        String? @unique
+  username     String  @unique
+  firstName    String?
+  lastName     String?
+  otherNames   String?
+  gender       Gender  @default(UNDISCLOSED)
+  country      String?
+  refreshToken String?
+  avatarUrl    String?
+  password     String
+
+  admin    Admin?
+  agencies Agency[]
+  agents   Agent[]
+
+  avatars   Avatar[]
+  AvatarToUser AvatarToUser[]
+
+  addedFiles   File[]
+
+  suggestions   Suggestion[]
+  SuggestionToUser SuggestionToUser[]
+
+  crimeTypes   CrimeType[]
+  CrimeTypeToUser CrimeTypeToUser[]
+  
+  crimeCategories CrimeCategory[]
+  CrimeCategoryToUser CrimeCategoryToUser[]
+
+  reportedCrimes Crime[]
+  addedDescriptiveMarkers DescriptiveMarker[]
+  posts Post[]
+
+  requestsFrom Request[] @relation("FromUser")
+  requestsTo Request[] @relation("ToUser")
+}
+
+model Avatar {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  url String @unique
+  path String
+
+  users User[]
+  AvatarToUser AvatarToUser[]
+  
+  agencies Agency[]
+  AvatarToAgency AvatarToAgency[]
+}
+
+model AvatarToUser {
+  avatarId Int
+  userId Int
+
+  user User @relation(fields: [userId], references: [id])
+  avatar Avatar @relation(fields: [avatarId], references: [id])
+
+  @@id([avatarId, userId])
+}
+
+model AvatarToAgency {
+  avatarId Int
+  agencyId Int
+
+  agency Agency @relation(fields: [agencyId], references: [id])
+  avatar Avatar @relation(fields: [avatarId], references: [id])
+
+  @@id([avatarId, agencyId])
+}
+
+model File {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  url String @unique
+  name String?
+  path String
+  mime String
+  size Int
+  userId Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  posts Post[]
+  FileToPost FileToPost[]
+
+  crimes Crime[]
+  FileToCrime FileToCrime[]
+
+  agencies Agency[]
+  FileToAgency FileToAgency[]
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type   AdminType @default(ADMIN)
+  userId Int       @unique
+  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  verifiedAgencies Agency[]
+}
+
+model Agency {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type       AgencyType @default(GOVERNMENT)
+  name       String
+  email String?
+  phoneNumber String?
+  about      String?
+  userId     Int
+  verifiedBy Int?
+  verifiedAt DateTime?
+  avatarUrl    String?
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  admin Admin? @relation(fields: [verifiedBy], references: [id], onDelete: Cascade)
+
+  agents        Agent[]
+  crimes        Crime[]         @relation("AgencyToCrime")
+  AgencyToCrime AgencyToCrime[]
+
+  suggestions   Suggestion[]
+  SuggestionToAgency SuggestionToAgency[]
+
+  crimeTypes   CrimeType[]
+  CrimeTypeToAgency CrimeTypeToAgency[]
+  
+  crimeCategories   CrimeCategory[]
+  CrimeCategoryToAgency CrimeCategoryToAgency[]
+  
+  files File[]
+  FileToAgency FileToAgency[]
+
+  post Post[]
+  PostToAgency PostToAgency[]
+
+  avatars   Avatar[]
+  AvatarToAgency AvatarToAgency[]
+
+  requests Request[]
+  RequestToAgency RequestToAgency[]
+}
+
+model Agent {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type     AgentType @default(NORMAL)
+  position String?
+  userId   Int
+  agencyId Int
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  crimes Crime[] @relation("AgentToCrime")
+  AgentToCrime  AgentToCrime[]
+  
+  suggestions   Suggestion[]
+  SuggestionToAgent SuggestionToAgent[]
+
+  crimeCategories   CrimeCategory[]
+  CrimeCategoryToAgent CrimeCategoryToAgent[]
+
+  crimeTypes   CrimeType[]
+  CrimeTypeToAgent CrimeTypeToAgent[]
+}
+
+model Request {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  fromId Int
+  toId Int
+  message String?
+  state RequestState @default(PENDING)
+
+  fromUser User @relation("FromUser", fields: [fromId], references: [id], onDelete: Cascade, map: "FromUserRequestByIdKey")
+  toUser User @relation("ToUser", fields: [fromId], references: [id], onDelete: Cascade, map: "ToUserRequestByIdKey")
+
+  agencies Agency[]
+  RequestToAgency RequestToAgency[]
+}
+
+
+enum RequestState {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model RequestToAgency{
+  requestId Int
+  agencyId Int
+
+  request Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@id([requestId, agencyId])
+}
+
+enum AgencyType {
+  GOVERNMENT
+  NONPROFIT
+  PROFIT
+}
+
+enum AgentType {
+  NORMAL
+  SUPER
+}
+
+enum AdminType {
+  ADMIN
+  SUPERADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  UNDISCLOSED
+}
+
+model Crime {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  landmark    String?
+  outcome     Outcome   @default(PENDING)
+  severity    Int       @default(1)
+  name        String
+  description String?
+  lat         Float
+  lon         Float
+  occurredOn  DateTime?
+  victim      Json?
+  suspect     Json?
+  userId Int?
+  anonymous Boolean
+  crimeTypeId Int?
+  crimeTypeName String?
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  crimeType CrimeType? @relation(fields: [crimeTypeId], references: [id], onDelete: Cascade)
+
+  agents        Agent[]         @relation("AgentToCrime")
+  agencies      Agency[]        @relation("AgencyToCrime")
+  AgencyToCrime AgencyToCrime[]
+  AgentToCrime  AgentToCrime[]
+
+  files File[]
+  FileToCrime FileToCrime[]
+
+  post Post[]
+  PostToCrime PostToCrime[]
+}
+
+model DescriptiveMarker {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  userId Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Outcome {
+  CONVICTION
+  PENDING
+  ACQUITTAL
+}
+
+model AgencyToCrime {
+  agencyId Int
+  crimeId  Int
+
+  crime  Crime  @relation(fields: [crimeId], references: [id], onDelete: Cascade)
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@id([agencyId, crimeId])
+}
+
+model AgentToCrime {
+  agentId Int
+  crimeId Int
+
+  crime  Crime  @relation(fields: [crimeId], references: [id], onDelete: Cascade)
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@id([agentId, crimeId])
+}
+
+model Suggestion {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type    SuggestionType @default(APP)
+  message String
+
+  users User[]
+  SuggestionToUser SuggestionToUser[]
+
+  agencies Agency[]
+  SuggestionToAgency SuggestionToAgency[]
+
+  agents Agent[]
+  SuggestionToAgent SuggestionToAgent[]
+}
+
+enum SuggestionType {
+  APP
+  CRIMECATEGORY
+  CRIMETYPE
+}
+
+model SuggestionToUser {
+  suggestionId Int
+  userId Int
+
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@id([suggestionId, userId])
+}
+
+model SuggestionToAgency {
+  suggestionId Int
+  agencyId Int
+
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id])
+  agency Agency @relation(fields: [agencyId], references: [id])
+
+  @@id([suggestionId, agencyId])
+}
+
+model SuggestionToAgent {
+  suggestionId Int
+  agentId Int
+
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id])
+  agent Agent @relation(fields: [agentId], references: [id])
+
+  @@id([suggestionId, agentId])
+}
+
+model CrimeCategory {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  description String?
+
+  users User[]
+  CrimeCategoryToUser CrimeCategoryToUser[]
+
+  agencies Agency[]
+  CrimeCategoryToAgency CrimeCategoryToAgency[]
+
+  agents Agent[]
+  CrimeCategoryToAgent CrimeCategoryToAgent[]
+
+  crimeTypes CrimeType[]
+}
+
+model CrimeCategoryToUser{
+  crimeCategoryId Int
+  userId Int
+
+  user User @relation(fields: [userId], references: [id])
+  crimeCategory CrimeCategory @relation(fields: [crimeCategoryId], references: [id])
+
+  @@id([crimeCategoryId, userId])
+}
+
+model CrimeCategoryToAgent{
+  crimeCategoryId Int
+  agentId Int
+
+  agent Agent @relation(fields: [agentId], references: [id])
+  crimeCategory CrimeCategory @relation(fields: [crimeCategoryId], references: [id])
+
+  @@id([crimeCategoryId, agentId])
+}
+
+model CrimeCategoryToAgency{
+  crimeCategoryId Int
+  agencyId Int
+
+  agency Agency @relation(fields: [agencyId], references: [id])
+  crimeCategory CrimeCategory @relation(fields: [crimeCategoryId], references: [id])
+
+  @@id([crimeCategoryId, agencyId])
+}
+
+model CrimeTypeToUser{
+  crimeTypeId Int
+  userId Int
+
+  user User @relation(fields: [userId], references: [id])
+  crimeType CrimeType @relation(fields: [crimeTypeId], references: [id])
+
+  @@id([crimeTypeId, userId])
+}
+
+model CrimeTypeToAgent{
+  crimeTypeId Int
+  agentId Int
+
+  agent Agent @relation(fields: [agentId], references: [id])
+  crimeType CrimeType @relation(fields: [crimeTypeId], references: [id])
+
+  @@id([crimeTypeId, agentId])
+}
+
+model CrimeTypeToAgency{
+  crimeTypeId Int
+  agencyId Int
+
+  agency Agency @relation(fields: [agencyId], references: [id])
+  crimeType CrimeType @relation(fields: [crimeTypeId], references: [id])
+
+  @@id([crimeTypeId, agencyId])
+}
+
+model CrimeType {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  description String?
+
+  crimeCategoryId Int
+  crimeCategory   CrimeCategory @relation(fields: [crimeCategoryId], references: [id], onDelete: Cascade)
+  
+  users User[]
+  CrimeTypeToUser CrimeTypeToUser[]
+
+  agencies Agency[]
+  CrimeTypeToAgency CrimeTypeToAgency[]
+
+  agents Agent[]
+  CrimeTypeToAgent CrimeTypeToAgent[]
+
+  crimes Crime[]
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  content String?
+  userId Int
+
+  user User @relation(fields: [userId], references: [id])
+
+  crime Crime[]
+  PostToCrime PostToCrime[]
+  
+  agency Agency[]
+  PostToAgency PostToAgency[]
+
+  files File[]
+  FileToPost FileToPost[]
+}
+
+model PostToAgency{
+  postId Int
+  agencyId Int
+
+  post Post @relation(fields: [postId], references: [id])
+  agency Agency @relation(fields: [agencyId], references: [id])
+
+  @@id([postId, agencyId])
+}
+
+model PostToCrime{
+  postId Int
+  crimeId Int
+
+  post Post @relation(fields: [postId], references: [id])
+  crime Crime @relation(fields: [crimeId], references: [id])
+
+  @@id([postId, crimeId])
+}
+
+model FileToPost {
+  postId Int
+  fileId Int
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@id([postId, fileId])
+}
+
+model FileToCrime {
+  crimeId Int
+  fileId Int
+
+  crime Crime @relation(fields: [crimeId], references: [id], onDelete: Cascade)
+  file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@id([crimeId, fileId])
+}
+
+model FileToAgency {
+  agencyId Int
+  fileId Int
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@id([agencyId, fileId])
+}
+
+enum PostableType {
+  Agency
+  Crime
+}
