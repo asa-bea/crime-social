@@ -19,7 +19,7 @@ function Navbar() {
     useEffect(() => {
         setUsername(user.username)
     }, [user])
-    
+
     function navigateTo(path: string) {
         setShow(false)
         navigate(path)
@@ -62,7 +62,7 @@ function Navbar() {
                 <div className="translate-y-1 bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text font-bold text-transparent">Social</div>
             </div>
 
-            {user.id ? 
+            {user.id ?
                 <>
                     <div className="hidden xs:flex mx-3 cursor-pointer relative">
                         <div
@@ -73,14 +73,14 @@ function Navbar() {
                             {!show && <div>▼</div>}
                             {show && <div>▲</div>}
                         </div>
-                        { show && <div className="absolute top-9 -right-2">
+                        { show && <div className="absolute top-9 -right-2 z-[1000]">
                             <div className="p-2 bg-blue-100 min-w-[200px] rounded-lg w-full text-center">
-                                {pathname != '/profile' && 
+                                {pathname != '/profile' &&
                                 <div onClick={() => navigateTo('/profile')}
                                     className="text-gray-500 cursor-pointer mb-2 p-2 rounded hover:bg-white hover:text-gray-700">
                                     profile
                                 </div>}
-                                {(pathname != '/admin' && user.admin) && 
+                                {(pathname != '/admin' && user.admin) &&
                                 <div onClick={() => navigateTo('/admin')}
                                     className="text-gray-500 cursor-pointer mb-2 p-2 rounded hover:bg-white hover:text-gray-700">
                                     admin dashboard
@@ -108,7 +108,7 @@ function Navbar() {
                                 {show && <div>▲</div>}
                             </div>
                         </div>
-                        { show && <div className="my-2">
+                        { show && <div className="my-2 z-[1000]">
                             <div className="p-2 bg-blue-100 rounded-lg w-[90%] mx-auto text-center mb-2">
                                 {pathname != '/profile' && <div onClick={() => navigateTo('/profile')}
                                     className="text-gray-500 cursor-pointer hover:bg-white hover:text-gray-700">
@@ -136,5 +136,5 @@ function Navbar() {
         </nav>
     )
   }
-  
+
   export default Navbar;

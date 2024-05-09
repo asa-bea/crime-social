@@ -55,7 +55,7 @@ export function Profile() {
         avatarFile: null,
     }
     const defaultLoader = { show: false, type: '' }
-    
+
     const [avatar, setAvatar] = useState({url: '', name: ''})
     const [profileData, setProfileData] = useState(defaultProfileData)
     const [userProfile, setUserProfile] = useState<UserType | null>(null)
@@ -68,7 +68,7 @@ export function Profile() {
     const refreshTokens = useRefreshToken()
     const [loading, setLoading] = useState(false)
     const { id } = useParams()
-    
+
     useEffect(() => {
         setFullName(`${user.lastName ?? ''} ${user.firstName ?? ''} ${user.otherNames ?? ''}`.trim())
         setAvatar({name: '',  url: user.avatarUrl})
@@ -91,7 +91,7 @@ export function Profile() {
 
     async function getUserProfile() {
         if (!id) {
-            if (user) return navigate(`profile/${user.id}`)
+            if (user) return navigate(`${user.id}`)
             return navigate(`signin`)
         }
 
@@ -246,10 +246,10 @@ export function Profile() {
 
         if (!passwordData.oldPassword) setFormError('oldPassword', 'old password is required')
         if (errors.oldPassword) setFormError('oldPassword', '')
-        
+
         if (!passwordData.newPassword) setFormError('newPassword', 'new password is required')
         if (errors.newPassword) setFormError('newPassword', '')
-        
+
         if (!passwordData.newPasswordConfirmation) setFormError('newPasswordConfirmation', 'new password confirmation is required')
         if (passwordData.newPassword !== passwordData.newPasswordConfirmation)
             setFormError('newPasswordConfirmation', 'new password confirmation must match the new password')
@@ -272,7 +272,7 @@ export function Profile() {
                 console.log(err)
                 if (
                     err.response?.status == StatusCodes.UNAUTHORIZED &&
-                    err.response?.data?.message == 'Unauthorized' 
+                    err.response?.data?.message == 'Unauthorized'
                 ) return await removeUserAndGoToSignInPage(submitPasswordChange)
 
                 const messages = err.response?.data?.message
@@ -314,7 +314,7 @@ export function Profile() {
                 console.log(err)
                 if (
                     err.response?.status == StatusCodes.UNAUTHORIZED &&
-                    err.response?.data?.message == 'Unauthorized' 
+                    err.response?.data?.message == 'Unauthorized'
                 ) return await removeUserAndGoToSignInPage(submitPasswordChange)
 
                 const messages = err.response?.data?.message
@@ -332,7 +332,7 @@ export function Profile() {
                 setLoader(defaultLoader)
             })
     }
-    
+
     function errorsIsNotEmpty() : boolean {
         let notEmpty = true
 
@@ -349,7 +349,7 @@ export function Profile() {
             message: typeof messages == 'string' ? messages : messages[0],
             type: isError ? 'failed' : 'success'
         })
-    
+
         Object.keys(errors).forEach((key: string) => {
             if (typeof messages == 'string' && messages.toLowerCase().split(' ')[0] == key) {
                 return setFormError(key, messages)
@@ -418,13 +418,13 @@ export function Profile() {
             value = value.toLowerCase()
             if (value.includes('newpassword'))
                 value = value.replaceAll('newpassword', 'new password')
-            
+
             if (value.includes('oldpassword'))
                 value = value.replaceAll('oldpassword', 'old password')
-            
+
             if (value.includes('passwordconfirmation'))
                 value = value.replaceAll('passwordconfirmation', 'password confirmation')
-            
+
             newData[type] = value
             return newData
         })
@@ -446,6 +446,8 @@ export function Profile() {
                     <div className="mx-5">
                         <DP username={user.username} avatarUrl={user.avatarUrl} size={100}></DP>
                     </div>
+
+                    <div className="hidden h-[100px] w-[100px] h-[90px] w-[90px] h-[85px] w-[85px] h-[70px] w-[70px] h-[60px] w-[60px] h-[55px] w-[55px] h-[80px] w-[80px] h-[70px] w-[70px] h-[65px] w-[65px]"></div>
                 </div>
             </div>
 
@@ -470,8 +472,8 @@ export function Profile() {
                     </div>
                     <div className="w-full flex flex-col my-2 p-2">
                         <ProfileInput
-                            placeholder="enter your first name" 
-                            type="firstName" 
+                            placeholder="enter your first name"
+                            type="firstName"
                             id="firstName"
                             name="firstName"
                             value={profileData.firstName}
@@ -482,8 +484,8 @@ export function Profile() {
                     </div>
                     <div className="w-full flex flex-col my-2 p-2">
                         <ProfileInput
-                            placeholder="enter your last name" 
-                            type="lastName" 
+                            placeholder="enter your last name"
+                            type="lastName"
                             id="lastName"
                             name="lastName"
                             value={profileData.lastName}
@@ -494,8 +496,8 @@ export function Profile() {
                     </div>
                     <div className="w-full flex flex-col my-2 p-2">
                         <ProfileInput
-                            placeholder="enter any other names" 
-                            type="otherNames" 
+                            placeholder="enter any other names"
+                            type="otherNames"
                             id="otherNames"
                             name="otherNames"
                             value={profileData.otherNames}
@@ -506,8 +508,8 @@ export function Profile() {
                     </div>
                     <div className="w-full flex flex-col my-2 p-2">
                         <ProfileInput
-                            placeholder="enter your email" 
-                            type="email" 
+                            placeholder="enter your email"
+                            type="email"
                             id="email"
                             name="email"
                             value={profileData.email}
@@ -518,7 +520,7 @@ export function Profile() {
                     </div>
                     <div className="w-full flex flex-col my-2 p-2">
                         <ProfileSelect
-                            initialOption="select your gender" 
+                            initialOption="select your gender"
                             id="gender"
                             name="gender"
                             options={['undisclosed', 'male', 'female']}
@@ -531,7 +533,7 @@ export function Profile() {
                     </div>
                     <div className="w-full flex flex-col my-2 p-2">
                         <ProfileSelect
-                            initialOption="select your country" 
+                            initialOption="select your country"
                             id="country"
                             name="country"
                             options={countries}
@@ -557,8 +559,8 @@ export function Profile() {
                 <form className="max-w-[400px] mx-auto" onSubmit={submitPasswordChange}>
                     <div className="w-full flex flex-col my-2 p-2">
                         <ProfileInput
-                            placeholder="enter old password" 
-                            type={showPassword ? "text" : "password"} 
+                            placeholder="enter old password"
+                            type={showPassword ? "text" : "password"}
                             id="oldPassword"
                             name="oldPassword"
                             value={passwordData.oldPassword}
@@ -569,8 +571,8 @@ export function Profile() {
                     </div>
                     <div className="w-full flex flex-col my-2 p-2">
                         <ProfileInput
-                            placeholder="enter new password" 
-                            type={showPassword ? "text" : "password"}  
+                            placeholder="enter new password"
+                            type={showPassword ? "text" : "password"}
                             id="newPassword"
                             name="newPassword"
                             value={passwordData.newPassword}
@@ -581,8 +583,8 @@ export function Profile() {
                     </div>
                     <div className="w-full flex flex-col my-2 p-2">
                         <ProfileInput
-                            placeholder="enter confirmation of new password" 
-                            type={showPassword ? "text" : "password"}  
+                            placeholder="enter confirmation of new password"
+                            type={showPassword ? "text" : "password"}
                             id="newPasswordConfirmation"
                             name="newPasswordConfirmation"
                             value={passwordData.newPasswordConfirmation}
