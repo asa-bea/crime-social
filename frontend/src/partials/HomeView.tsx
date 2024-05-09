@@ -58,11 +58,11 @@ function HomeView(
 
     return (
         <>
-            <div className="my-3 h-[300px] w-full bg-slate-100 p-2 max-w-[500px] mx-auto" id="homemap">
+            <div className="my-3 h-[300px] w-full bg-slate-100 p-2 mx-auto" id="homemap">
 
             </div>
-            <div className="flex justify-start p-2 items-center overflow-y-auto mx-auto max-w-[600px]">
-                <div className="w-[200px] mx-4 rounded-lg bg-blue-100 p-4 text-sm flex-shrink-0">
+            <div className="flex justify-start p-2 items-center overflow-y-auto mx-auto">
+                <div className="w-[500px] mx-4 rounded-lg bg-blue-100 p-4 text-sm flex-shrink-0">
                     {user?.id ? 
                         <>
                             <div>
@@ -88,7 +88,7 @@ function HomeView(
                     </>
                     }
                 </div>
-                <div className="w-[200px] mx-4 rounded-lg bg-blue-100 p-4 text-sm flex-shrink-0">
+                <div className="w-[500px] mx-4 rounded-lg bg-blue-100 p-4 text-sm flex-shrink-0">
                     <div>
                         Want to view reported crimes in and around your current location? Lets show what we have here... just click the the show button 👇
                     </div>
@@ -96,7 +96,7 @@ function HomeView(
                         <Button onClick={() => clickedShowCurrent()}>show</Button>
                     </div>
                 </div>
-                <div className="w-[200px] mx-4 rounded-lg bg-blue-100 p-4 text-sm flex-shrink-0 mr-6">
+                <div className="w-[500px] mx-4 rounded-lg bg-blue-100 p-4 text-sm flex-shrink-0 mr-6">
                     <div>
                         Want to have your Agency on this platform? It could be a Government, Profit or Non-profit agency... just click the button below 👇
                     </div>

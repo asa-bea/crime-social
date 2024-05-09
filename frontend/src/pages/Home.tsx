@@ -834,7 +834,7 @@ function Home() {
               onClick={() => setView(HomeViews.agencies)}>agencies</div>
           </div>
         </div>
-        <div className="flex justify-center items-start h-[90vh] flex-shrink w-[90%] sm:w-[60%] md:w-[80%] mx-auto">
+        <div className="flex justify-center items-start h-[90vh] flex-shrink w-[90%] sm:w-[80%] md:w-[80%] mx-auto">
           <div className="w-full">
             <HomeView
               createCrime={() => setFormType('report')}

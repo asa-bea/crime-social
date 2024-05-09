@@ -1006,6 +1006,14 @@ video {
   width: 100%;
 }
 
+.w-\[400px\] {
+  width: 400px;
+}
+
+.w-\[500px\] {
+  width: 500px;
+}
+
 .min-w-\[100px\] {
   min-width: 100px;
 }
@@ -1867,6 +1875,10 @@ video {
 
   .sm\:w-full {
     width: 100%;
+  }
+
+  .sm\:w-\[80\%\] {
+    width: 80%;
   }
 
   .sm\:min-w-\[300px\] {
